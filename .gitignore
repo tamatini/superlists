@@ -1,0 +1,11 @@
+db.sqlite3
+geckodriver.log
+virtualenv
+.idea
+.idea/misc.xml
+.idea/misc.xml
+.idea/modules.xml
+__pycache__
+.idea
+*.pyc
+*.xml
