@@ -1,0 +1,15 @@
+[Unit]
+Description=Gunicorn server for DOMAIN
+
+[Service]
+Restart=on-failure
+User=tamatini
+WorkingDirectory=/home/tamatini/sites/DOMAIN
+EnvironmentFile=/home/tamatini/sites/DOMAIN/.env
+
+ExecStart=/home/tamatini/sites/DOMAIN/virtualenv/bin/gunicorn \
+	--bind unix:/tmp/DOMAIN.socket \
+	superlists.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
