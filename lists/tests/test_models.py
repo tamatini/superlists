@@ -3,6 +3,8 @@ from lists.models import Item, List
 from django.core.exceptions import ValidationError
 
 
+
+
 class ListAndItemModelsTest(TestCase):
     def test_saving_and_retrieve_items(self):
         list_= List()
