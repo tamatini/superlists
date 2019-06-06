@@ -66,13 +66,13 @@ class ListViewTest(TestCase):
 
     def test_validation_error_are_shown_on_home_page(self):
         response = self.client.post('/lists/new', data={'text': ''})
-        self.assertContains(response, EMPTY_ITEM_ERROR)
+        self.assertContains(response, escape(EMPTY_ITEM_ERROR))
 
 
     def test_for_invalid_input_passes_form_template(self):
         response = self.client.post('/lists/new', data={'text': ''})
         self.assertIsInstance(response.context['form'], ItemForm)
-        
+
 
     def test_invalid_list_item_arent_saved(self):
         self.client.post('/lists/new', data={'text': ""})
@@ -107,13 +107,33 @@ class ListViewTest(TestCase):
         self.assertRedirects(response, f'/lists/{correct_list.id}/')
 
 
-    def test_validation_errors_end_up_on_list_page(self):
+    def post_invalid_input(self):
         list_ = List.objects.create()
-        response = self.client.post(
+        return self.client.post(
             f'/lists/{list_.id}/',
             data={"text": ""}
         )
+
+    def test_invalid_input_nothing_saved_to_db(self):
+        self.post_invalid_input()
+        self.assertEqual(Item.objects.count(), 0)
+
+
+    def test_for_invalid_input_renders_list_template(self):
+        response = self.post_invalid_input()
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "list.html")
-        expected_error = escape("You can't have an empty list item")
-        self.assertContains(response, expected_error)
+
+    def test_for_invalid_input_pass_form_to_template(self):
+        response = self.post_invalid_input()
+        self.assertIsInstance(response.context['form'], ItemForm)
+
+    def test_for_invalid_input_show_error_on_page(self):
+        response = self.post_invalid_input()
+        self.assertContains(response, escape(EMPTY_ITEM_ERROR))
+
+    def test_display_item_form(self):
+        list_ = List.objects.create()
+        response = self.client.get(f'/lists/{list_.id}/')
+        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertContains(response, 'name="text"')
